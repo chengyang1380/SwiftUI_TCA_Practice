@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		0F36DAD92D8337030065FE1F /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 0F36DAD82D8337030065FE1F /* ComposableArchitecture */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		0F36DAAC2D8334750065FE1F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0F36DAD92D8337030065FE1F /* ComposableArchitecture in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = SwiftUI_TCA_Practice;
 			packageProductDependencies = (
+				0F36DAD82D8337030065FE1F /* ComposableArchitecture */,
 			);
 			productName = SwiftUI_TCA_Practice;
 			productReference = 0F36DA9B2D8334730065FE1F /* SwiftUI_TCA_Practice.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = 0F36DA922D8334730065FE1F;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				0F36DAD72D8337030065FE1F /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 0F36DA9C2D8334730065FE1F /* Products */;
 			projectDirPath = "";
@@ -558,6 +567,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		0F36DAD72D8337030065FE1F /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.18.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		0F36DAD82D8337030065FE1F /* ComposableArchitecture */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0F36DAD72D8337030065FE1F /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
+			productName = ComposableArchitecture;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 0F36DA932D8334730065FE1F /* Project object */;
 }
