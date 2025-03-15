@@ -8,8 +8,6 @@
 import ComposableArchitecture
 import SwiftUI
 
-
-
 @Reducer
 struct Counter {
 
@@ -27,7 +25,7 @@ struct Counter {
         case playNext
         case slidingCount(Float)
     }
-    
+
     struct Environment {
         var generateRandom: (ClosedRange<Int>) -> Int
 
@@ -77,7 +75,7 @@ extension Counter.State {
 
     var countFloat: Float {
         get { Float(count) }
-        set { count = Int(count) }
+        set { count = Int(newValue) }
     }
 }
 
@@ -93,7 +91,6 @@ extension Counter.State {
     }
 }
 
-
 extension DependencyValues {
     var counterEnvironment: Counter.Environment {
         get { self[Counter.EnvironmentKey.self] }
@@ -102,17 +99,11 @@ extension DependencyValues {
 }
 
 struct CounterView: View {
-    
-    @State private var scale: Double = 1
-    
-    @State private var scale2: Double = 1
-    
-    
+
     @Bindable var store: StoreOf<Counter>
 
     var body: some View {
         VStack {
-            
             checkLabel(with: store.checkResult)
             HStack {
                 Button("-") { store.send(.decrement) }
