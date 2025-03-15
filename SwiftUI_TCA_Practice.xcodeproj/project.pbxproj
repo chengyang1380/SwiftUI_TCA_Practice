@@ -44,11 +44,6 @@
 			path = SwiftUI_TCA_PracticeTests;
 			sourceTree = "<group>";
 		};
-		0F36DAB82D8334750065FE1F /* SwiftUI_TCA_PracticeUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = SwiftUI_TCA_PracticeUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,7 +77,6 @@
 			children = (
 				0F36DA9D2D8334730065FE1F /* SwiftUI_TCA_Practice */,
 				0F36DAAE2D8334750065FE1F /* SwiftUI_TCA_PracticeTests */,
-				0F36DAB82D8334750065FE1F /* SwiftUI_TCA_PracticeUITests */,
 				0F36DA9C2D8334730065FE1F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -158,9 +152,6 @@
 			);
 			dependencies = (
 				0F36DAB72D8334750065FE1F /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				0F36DAB82D8334750065FE1F /* SwiftUI_TCA_PracticeUITests */,
 			);
 			name = SwiftUI_TCA_PracticeUITests;
 			packageProductDependencies = (
