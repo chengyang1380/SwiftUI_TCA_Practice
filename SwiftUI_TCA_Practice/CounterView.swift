@@ -8,13 +8,13 @@
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - View Model
 @Reducer
 struct Counter {
 
     @ObservableState
     struct State: Equatable {
         var count: Int = 0
-        var color: Color = .black
         var secret = Int.random(in: -100...100)
     }
 
@@ -54,13 +54,6 @@ struct Counter {
                 state.secret = DependencyValues().counterEnvironment
                     .generateRandom(-100...100)
             }
-            if state.count > 0 {
-                state.color = .green
-            } else if state.count < 0 {
-                state.color = .red
-            } else {
-                state.color = .black
-            }
             return .none
         }
         ._printChanges()
@@ -98,6 +91,7 @@ extension DependencyValues {
     }
 }
 
+// MARK: - View
 struct CounterView: View {
 
     @Bindable var store: StoreOf<Counter>
@@ -114,9 +108,9 @@ struct CounterView: View {
                         set: { store.send(.setCount($0)) }
                     )
                 )
-                .foregroundStyle(store.state.color)
                 .multilineTextAlignment(.center)
-                .frame(width: 80)
+                .foregroundColor(colorOfCount(store.count))
+                .frame(width: 40)
                 Button("+") { store.send(.increment) }
             }
 
@@ -131,8 +125,9 @@ struct CounterView: View {
             Button {
                 store.send(.playNext)
             } label: {
-                Text("New Game")
+                Text("Next")
             }
+            .frame(width: 150)
         }
     }
 
@@ -148,6 +143,11 @@ struct CounterView: View {
             return Label("Correct", systemImage: "checkmark.circle")
                 .foregroundColor(.green)
         }
+    }
+
+    func colorOfCount(_ value: Int) -> Color? {
+        if value == 0 { return nil }
+        return value < 0 ? .red : .green
     }
 }
 
