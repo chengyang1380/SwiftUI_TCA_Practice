@@ -49,6 +49,7 @@ struct Counter {
             case .playNext:
                 state.count = 0
                 state.secret = environment.generateRandom(-100...100)
+                state.id = environment.uuid()
             }
             return .none
         }
