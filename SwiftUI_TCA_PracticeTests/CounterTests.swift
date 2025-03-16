@@ -11,12 +11,13 @@ import Testing
 
 @testable import SwiftUI_TCA_Practice
 
+@MainActor
 struct CounterTests {
 
     let store: TestStore<Counter.State, Counter.Action>
 
-    init() async {
-        store = await TestStore(initialState: Counter.State()) {
+    init() {
+        store = TestStore(initialState: Counter.State()) {
             Counter()
         } withDependencies: {
             $0.counterEnvironment = .init(
