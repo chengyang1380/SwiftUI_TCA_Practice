@@ -19,8 +19,10 @@ struct SwiftUI_TCA_PracticeApp: App {
                         Counter()
                     },
                     withDependencies: {
-                        $0.counterEnvironment = .live
-                    }))
+                        $0.counterEnvironment = .liveValue
+                    }
+                )
+            )
         }
     }
 }

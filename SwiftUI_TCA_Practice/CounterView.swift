@@ -11,11 +11,15 @@ import SwiftUI
 // MARK: - View Model
 @Reducer
 struct Counter {
+    
+    @Dependency(\.counterEnvironment) var environment
 
     @ObservableState
     struct State: Equatable {
         var count: Int = 0
         var secret = Int.random(in: -100...100)
+
+        var id: UUID = UUID()
     }
 
     enum Action {
@@ -28,14 +32,7 @@ struct Counter {
 
     struct Environment {
         var generateRandom: (ClosedRange<Int>) -> Int
-
-        static let live: Self = .init(generateRandom: Int.random(in:))
-    }
-
-    struct EnvironmentKey: DependencyKey {
-        static let liveValue = Environment(generateRandom: { range in
-            Int.random(in: range)
-        })
+        var uuid: () -> UUID
     }
 
     var body: some ReducerOf<Self> {
@@ -51,8 +48,7 @@ struct Counter {
                 state.countFloat = value
             case .playNext:
                 state.count = 0
-                state.secret = DependencyValues().counterEnvironment
-                    .generateRandom(-100...100)
+                state.secret = environment.generateRandom(-100...100)
             }
             return .none
         }
@@ -70,9 +66,7 @@ extension Counter.State {
         get { Float(count) }
         set { count = Int(newValue) }
     }
-}
 
-extension Counter.State {
     enum CheckResult {
         case lower, equal, higher
     }
@@ -84,10 +78,22 @@ extension Counter.State {
     }
 }
 
+extension Counter.Environment: DependencyKey {
+    static let liveValue = Self(
+        generateRandom: { Int.random(in: $0) },
+        uuid: { UUID() }
+    )
+
+    static let testValue: Counter.Environment = .init(
+        generateRandom: { _ in 1 },
+        uuid: { UUID(1) }
+    )
+}
+
 extension DependencyValues {
     var counterEnvironment: Counter.Environment {
-        get { self[Counter.EnvironmentKey.self] }
-        set { self[Counter.EnvironmentKey.self] = newValue }
+        get { self[Counter.Environment.self] }
+        set { self[Counter.Environment.self] = newValue }
     }
 }
 
@@ -155,5 +161,8 @@ struct CounterView: View {
     CounterView(
         store: Store(initialState: Counter.State()) {
             Counter()
-        })
+        } withDependencies: {
+            $0.counterEnvironment = .testValue
+        }
+    )
 }
