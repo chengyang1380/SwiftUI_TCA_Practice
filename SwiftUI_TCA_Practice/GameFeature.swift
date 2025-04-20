@@ -1,0 +1,87 @@
+//
+//  GameFeature.swift
+//  SwiftUI_TCA_Practice
+//
+//  Created by ChengYangChen on 4/13/25.
+//
+
+import ComposableArchitecture
+import Foundation
+
+@Reducer
+struct GameFeature {
+    @Dependency(\.gameFeatureEnvironment) var environment
+
+    @ObservableState
+    struct State: Equatable {
+        var counter: Counter.State = .init()
+        var timer: TimerFeature.State = .init()
+
+        var results = IdentifiedArrayOf<Result>()
+        var lastTimestamp = 0.0
+    }
+
+    enum Action {
+        case counter(Counter.Action)
+        case timer(TimerFeature.Action)
+    }
+
+    struct Environment {
+        var generateRandom: (ClosedRange<Int>) -> Int
+        var uuid: () -> UUID
+        var date: () -> Date
+    }
+
+    struct Result: Equatable, Identifiable {
+        let counterState: Counter.State
+        let spentTime: TimeInterval
+
+        var correct: Bool { counterState.secret == counterState.count }
+        var id: UUID { counterState.id }
+    }
+
+    var body: some ReducerOf<Self> {
+        Scope(state: \.counter, action: \.counter) {
+            Counter()
+        }.transformDependency(\.counterEnvironment) { dependency in
+            dependency.generateRandom = environment.generateRandom
+            dependency.uuid = environment.uuid
+        }
+        Scope(state: \.timer, action: \.timer) {
+            TimerFeature()
+        }.transformDependency(\.date) { dependency in
+            dependency.now = environment.date()
+        }
+        Reduce { state, action in
+            switch action {
+            case .counter(.playNext):
+                let result = Result(counterState: state.counter, spentTime: state.timer.duration - state.lastTimestamp)
+                state.results.append(result)
+                state.lastTimestamp = state.timer.duration
+                return .none
+            default: return .none
+            }
+        }._printChanges()
+    }
+}
+
+extension GameFeature.Environment: DependencyKey {
+    static let liveValue = Self(
+        generateRandom: { Int.random(in: $0) },
+        uuid: { UUID() },
+        date: { Date() }
+    )
+
+    static let testValue = Self(
+        generateRandom: { _ in 1 },
+        uuid: { UUID() },
+        date: { Date(timeIntervalSince1970: 300_000) }
+    )
+}
+
+extension DependencyValues {
+    var gameFeatureEnvironment: GameFeature.Environment {
+        get { self[GameFeature.Environment.self] }
+        set { self[GameFeature.Environment.self] = newValue }
+    }
+}

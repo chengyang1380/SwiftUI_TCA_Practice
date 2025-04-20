@@ -12,14 +12,11 @@ import SwiftUI
 struct SwiftUI_TCA_PracticeApp: App {
     var body: some Scene {
         WindowGroup {
-            CounterView(
+            GameView(
                 store: Store(
-                    initialState: Counter.State(),
+                    initialState: GameFeature.State(),
                     reducer: {
-                        Counter()
-                    },
-                    withDependencies: {
-                        $0.counterEnvironment = .liveValue
+                        GameFeature()
                     }
                 )
             )
