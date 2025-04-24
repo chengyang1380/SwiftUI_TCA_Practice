@@ -41,6 +41,16 @@ struct GameFeature {
     }
 
     var body: some ReducerOf<Self> {
+        Reduce { state, action in
+            switch action {
+                case .counter(.playNext):
+                    let result = Result(counterState: state.counter, spentTime: state.timer.duration - state.lastTimestamp)
+                    state.results.append(result)
+                    state.lastTimestamp = state.timer.duration
+                    return .none
+                default: return .none
+            }
+        }
         Scope(state: \.counter, action: \.counter) {
             Counter()
         }.transformDependency(\.counterEnvironment) { dependency in
@@ -52,16 +62,6 @@ struct GameFeature {
         }.transformDependency(\.date) { dependency in
             dependency.now = environment.date()
         }
-        Reduce { state, action in
-            switch action {
-            case .counter(.playNext):
-                let result = Result(counterState: state.counter, spentTime: state.timer.duration - state.lastTimestamp)
-                state.results.append(result)
-                state.lastTimestamp = state.timer.duration
-                return .none
-            default: return .none
-            }
-        }._printChanges()
     }
 }
 
