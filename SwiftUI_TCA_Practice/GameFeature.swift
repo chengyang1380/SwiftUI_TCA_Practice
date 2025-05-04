@@ -17,7 +17,7 @@ struct GameFeature {
         var counter: Counter.State = .init()
         var timer: TimerFeature.State = .init()
 
-        var results = IdentifiedArrayOf<Result>()
+        var results = IdentifiedArrayOf<GameResult>()
         var lastTimestamp = 0.0
     }
 
@@ -32,23 +32,18 @@ struct GameFeature {
         var date: () -> Date
     }
 
-    struct Result: Equatable, Identifiable {
-        let counterState: Counter.State
-        let spentTime: TimeInterval
-
-        var correct: Bool { counterState.secret == counterState.count }
-        var id: UUID { counterState.id }
-    }
-
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-                case .counter(.playNext):
-                    let result = Result(counterState: state.counter, spentTime: state.timer.duration - state.lastTimestamp)
-                    state.results.append(result)
-                    state.lastTimestamp = state.timer.duration
-                    return .none
-                default: return .none
+            case .counter(.playNext):
+                let result = GameResult(
+                    counter: state.counter,
+                    spentTime: state.timer.duration - state.lastTimestamp
+                )
+                state.results.append(result)
+                state.lastTimestamp = state.timer.duration
+                return .none
+            default: return .none
             }
         }
         Scope(state: \.counter, action: \.counter) {
@@ -84,4 +79,12 @@ extension DependencyValues {
         get { self[GameFeature.Environment.self] }
         set { self[GameFeature.Environment.self] = newValue }
     }
+}
+
+struct GameResult: Equatable, Identifiable {
+    let counter: Counter.State
+    let spentTime: TimeInterval
+
+    var correct: Bool { counter.secret == counter.count }
+    var id: UUID { counter.id }
 }

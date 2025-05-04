@@ -23,8 +23,11 @@ struct GameView: View {
         }
     }
 
-    func resultLabel(_ results: IdentifiedArrayOf<GameFeature.Result>) -> some View {
-        Text("Result: \(results.filter(\.correct).count)/\(results.count) correct")
+    func resultLabel(_ results: IdentifiedArrayOf<GameResult>) -> some View {
+        VStack {
+            Text("Result: \(results.filter(\.correct).count)/\(results.count) correct")
+            Spacer()
+        }
     }
 }
 
