@@ -12,14 +12,29 @@ import SwiftUI
 struct SwiftUI_TCA_PracticeApp: App {
     var body: some Scene {
         WindowGroup {
-            GameView(
-                store: Store(
-                    initialState: GameFeature.State(),
-                    reducer: {
-                        GameFeature()
-                    }
+            NavigationStack {
+                GameView(
+                    store: Store(
+                        initialState: testState,
+                        reducer: {
+                            GameFeature()
+                        }
+                    )
                 )
-            )
+            }
         }
     }
 }
+
+let sample = GameResultListFeature.State(results: [
+    .init(counter: .init(count: 10, secret: 10, id: .init()), spentTime: 100),
+    .init(counter: .init(), spentTime: 500),
+])
+
+let testState = GameFeature.State(
+    counter: .init(),
+    timer: .init(),
+    resultState: sample,
+    lastTimestamp: 100,
+    resultListState: nil
+)

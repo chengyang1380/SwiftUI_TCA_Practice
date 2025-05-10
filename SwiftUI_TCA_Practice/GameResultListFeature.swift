@@ -11,7 +11,7 @@ import Foundation
 @Reducer
 struct GameResultListFeature {
     @ObservableState
-    struct State {
+    struct State: Equatable {
         var results: IdentifiedArrayOf<GameResult> = []
     }
 

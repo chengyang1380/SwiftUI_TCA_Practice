@@ -17,13 +17,16 @@ struct GameFeature {
         var counter: Counter.State = .init()
         var timer: TimerFeature.State = .init()
 
-        var results = IdentifiedArrayOf<GameResult>()
+        var resultState: GameResultListFeature.State = .init()
         var lastTimestamp = 0.0
+        var resultListState: Identified<UUID, GameResultListFeature.State>?
     }
 
     enum Action {
         case counter(Counter.Action)
         case timer(TimerFeature.Action)
+        case listResult(GameResultListFeature.Action)
+        case setNavigation(UUID?)
     }
 
     struct Environment {
@@ -40,8 +43,17 @@ struct GameFeature {
                     counter: state.counter,
                     spentTime: state.timer.duration - state.lastTimestamp
                 )
-                state.results.append(result)
+                state.resultState.results.append(result)
                 state.lastTimestamp = state.timer.duration
+                return .none
+            case .setNavigation(.some(let id)):
+                state.resultListState = .init(state.resultState, id: id)
+                return .none
+            case .setNavigation(.none):
+                if let newState = state.resultListState?.value {
+                    state.resultState = newState
+                }
+                state.resultListState = nil
                 return .none
             default: return .none
             }
@@ -56,6 +68,9 @@ struct GameFeature {
             TimerFeature()
         }.transformDependency(\.date) { dependency in
             dependency.now = environment.date()
+        }
+        Scope(state: \.resultListState!.value, action: \.listResult) {
+            GameResultListFeature()
         }
     }
 }
