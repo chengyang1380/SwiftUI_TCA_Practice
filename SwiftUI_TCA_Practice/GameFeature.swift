@@ -22,6 +22,7 @@ struct GameFeature {
         var lastTimestamp = 0.0
         var resultListState: Identified<UUID, GameResultListFeature.State>?
         @Presents var alert: AlertState<GameAlertAction>?
+        var savingResults: Bool = false
     }
 
     enum Action {
@@ -30,6 +31,7 @@ struct GameFeature {
         case listResult(GameResultListFeature.Action)
         case setNavigation(UUID?)
         case alertAction(PresentationAction<GameAlertAction>)
+        case saveResult(Result<Void, URLError>)
     }
 
     enum GameAlertAction: Equatable {
@@ -81,12 +83,19 @@ struct GameFeature {
                 state.alert = nil
                 return .none
             case .alertAction(.presented(.alertSaveButtonTapped)):
+                state.savingResults = true
+                return .run { send in
+                    try await Task.sleep(for: .seconds(2))
+                    await send(.saveResult(.success(Void())))
+                }
+            case .alertAction(.presented(.alertCancelButtonTapped)):
+                state.resultListState = nil
+                return .none
+            case .saveResult(let result):
+                state.savingResults = false
                 if let newState = state.resultListState?.value {
                     state.resultState = newState
                 }
-                state.resultListState = nil
-                return .none
-            case .alertAction(.presented(.alertCancelButtonTapped)):
                 state.resultListState = nil
                 return .none
             default: return .none

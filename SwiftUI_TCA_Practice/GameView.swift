@@ -26,7 +26,6 @@ struct GameView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 NavigationLink(
-                    "Detail",
                     tag: resultListStateTag,
                     selection: .init(
                         get: { store.resultListState?.id },
@@ -40,8 +39,13 @@ struct GameView: View {
                             ),
                             then: { GameResultListView(store: $0) }
                         )
-                    }
-                )
+                    }, label: {
+                        if store.savingResults {
+                            ProgressView()
+                        } else {
+                            Text("Detail")
+                        }
+                    })
             }
         }
         .alert($store.scope(state: \.alert, action: \.alertAction))
