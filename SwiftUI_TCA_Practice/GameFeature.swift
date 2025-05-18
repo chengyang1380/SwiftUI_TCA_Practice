@@ -11,6 +11,7 @@ import Foundation
 @Reducer
 struct GameFeature {
     @Dependency(\.gameFeatureEnvironment) var environment
+    @Dependency(\.dismiss) var dissmiss
 
     @ObservableState
     struct State: Equatable {
@@ -20,6 +21,7 @@ struct GameFeature {
         var resultState: GameResultListFeature.State = .init()
         var lastTimestamp = 0.0
         var resultListState: Identified<UUID, GameResultListFeature.State>?
+        @Presents var alert: AlertState<GameAlertAction>?
     }
 
     enum Action {
@@ -27,6 +29,12 @@ struct GameFeature {
         case timer(TimerFeature.Action)
         case listResult(GameResultListFeature.Action)
         case setNavigation(UUID?)
+        case alertAction(PresentationAction<GameAlertAction>)
+    }
+
+    enum GameAlertAction: Equatable {
+        case alertSaveButtonTapped
+        case alertCancelButtonTapped
     }
 
     struct Environment {
@@ -50,9 +58,35 @@ struct GameFeature {
                 state.resultListState = .init(state.resultState, id: id)
                 return .none
             case .setNavigation(.none):
+                if state.resultListState?.value.results != state.resultState.results {
+                    state.alert = .init(
+                        title: { TextState("Save Changes?") },
+                        actions: {
+                            ButtonState<GameFeature.GameAlertAction>.init(
+                                action: .send(.alertSaveButtonTapped),
+                                label: { .init("OK") }
+                            )
+                            ButtonState<GameFeature.GameAlertAction>.init(
+                                role: .cancel,
+                                action: .send(.alertCancelButtonTapped),
+                                label: { .init("Cancel") }
+                            )
+                        }
+                    )
+                } else {
+                    state.resultListState = nil
+                }
+                return .none
+            case .alertAction(.dismiss):
+                state.alert = nil
+                return .none
+            case .alertAction(.presented(.alertSaveButtonTapped)):
                 if let newState = state.resultListState?.value {
                     state.resultState = newState
                 }
+                state.resultListState = nil
+                return .none
+            case .alertAction(.presented(.alertCancelButtonTapped)):
                 state.resultListState = nil
                 return .none
             default: return .none

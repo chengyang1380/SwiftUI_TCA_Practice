@@ -8,11 +8,11 @@
 import ComposableArchitecture
 import SwiftUI
 
+let resultListStateTag = UUID()
+
 struct GameView: View {
 
     @Bindable var store: StoreOf<GameFeature>
-
-    let resultListStateTag = UUID()
 
     var body: some View {
         VStack {
@@ -44,6 +44,7 @@ struct GameView: View {
                 )
             }
         }
+        .alert($store.scope(state: \.alert, action: \.alertAction))
     }
 
     func resultLabel(_ results: IdentifiedArrayOf<GameResult>) -> some View {
