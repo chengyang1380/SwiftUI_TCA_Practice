@@ -26,6 +26,7 @@ struct SampleTextFeature {
 
     struct Environment {
         var loadText: () -> Effect<Result<String, URLError>>
+        var queue: AnySchedulerOf<DispatchQueue>
     }
 
     var body: some ReducerOf<Self> {
@@ -33,8 +34,13 @@ struct SampleTextFeature {
             switch action {
             case .load:
                 state.loading = true
-                return environment.loadText()
-                    .map { .loaded($0) }
+                return .run { send in
+                    try await environment.queue.sleep(for: .zero)
+                }.concatenate(
+                    with:
+                        environment.loadText()
+                        .map { .loaded($0) }
+                )
             case .loaded(let result):
                 state.loading = false
                 do {
@@ -49,12 +55,25 @@ struct SampleTextFeature {
 }
 
 extension SampleTextFeature.Environment: DependencyKey {
+    static var sampleRequest: Effect<Result<String, URLError>> {
+        .run { send in
+            let request = URLRequest(
+                url: URL(string: "https://example.com/sample-text")!
+            )
+            let (data, _) = try await URLSession.shared.data(for: request)
+            let result = String(data: data, encoding: .utf8) ?? ""
+            await send(.success(result))
+        }
+    }
+
     static var liveValue = Self(
-        loadText: { .run { send in await send(.success("Hello, World!")) } }  // throw some error }}
+        loadText: { sampleRequest },
+        queue: .global()
     )
 
     static var testValue = Self(
-        loadText: { .run { send in await send(.success("Hello, World!")) } }  // send(.failure(URLError.init(.badURL))) }}
+        loadText: { .run { send in await send(.success("Hello, World!")) } },  // send(.failure(URLError.init(.badURL))) }}
+        queue: .global()
     )
 }
 
