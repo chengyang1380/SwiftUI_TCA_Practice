@@ -12,6 +12,7 @@ import Foundation
 struct GameFeature {
     @Dependency(\.gameFeatureEnvironment) var environment
     @Dependency(\.dismiss) var dissmiss
+    @Dependency(\.mainQueue) var mainQueue
 
     @ObservableState
     struct State: Equatable {
@@ -85,7 +86,7 @@ struct GameFeature {
             case .alertAction(.presented(.alertSaveButtonTapped)):
                 state.savingResults = true
                 return .run { send in
-                    try await Task.sleep(for: .seconds(2))
+                    try await mainQueue.sleep(for: .seconds(2))
                     await send(.saveResult(.success(Void())))
                 }
             case .alertAction(.presented(.alertCancelButtonTapped)):

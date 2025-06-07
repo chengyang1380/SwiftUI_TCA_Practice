@@ -36,4 +36,5 @@ let testState = GameFeature.State(
     timer: .init(),
     resultState: sample,
     lastTimestamp: 100
+//    resultListState: .init(sample, id: resultListStateTag)
 )

@@ -32,20 +32,21 @@ struct GameView: View {
                         set: { id in store.send(.setNavigation(id)) }
                     ),
                     destination: {
-                        IfLetStore(
-                            store.scope(
-                                state: \.resultListState?.value,
-                                action: \.listResult
-                            ),
-                            then: { GameResultListView(store: $0) }
-                        )
-                    }, label: {
+                        if let store = store.scope(
+                            state: \.resultListState?.value,
+                            action: \.listResult
+                        ) {
+                            GameResultListView(store: store)
+                        }
+                    },
+                    label: {
                         if store.savingResults {
                             ProgressView()
                         } else {
                             Text("Detail")
                         }
-                    })
+                    }
+                )
             }
         }
         .alert($store.scope(state: \.alert, action: \.alertAction))
@@ -53,7 +54,9 @@ struct GameView: View {
 
     func resultLabel(_ results: IdentifiedArrayOf<GameResult>) -> some View {
         VStack {
-            Text("Result: \(results.filter(\.correct).count)/\(results.count) correct")
+            Text(
+                "Result: \(results.filter(\.correct).count)/\(results.count) correct"
+            )
             Spacer()
         }
     }
